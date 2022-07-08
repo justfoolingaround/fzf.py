@@ -2,7 +2,7 @@ import enum
 
 
 class Algorithm(enum.Enum):
-    V1 = "V1"
+    V1 = "v1"
     V2 = "v2"
 
 
@@ -71,7 +71,7 @@ def get_opts(
     only_ascii_borders: bool = False,
     margin: str = None,
     padding: str = None,
-    info_style: InfoStyle = InfoStyle.DEFAULT,
+    info_style: InfoStyle = None,
     hide_info: bool = False,
     prompt_string: str = None,
     pointer_string: str = None,
@@ -80,7 +80,7 @@ def get_opts(
     header_lines: int = None,
     header_first: bool = False,
     ansi: bool = False,
-    tab_character_number: int = 8,
+    tab_character_number: int = None,
     color: str = None,
     bold_off: bool = False,
     use_black_background: bool = False,

@@ -34,7 +34,6 @@ class Fzf:
             [EXECUTABLE, *opts],
             stdout=subprocess.PIPE,
             stdin=subprocess.PIPE,
-            stderr=subprocess.PIPE,
         )
         self.encoding_options = {
             "encoding": encoding,
@@ -94,11 +93,6 @@ class Fzf:
 
         self.process.wait()
 
-        stderr = self.process.stderr.read().decode(**self.encoding_options).strip()
-
-        if stderr:
-            raise RuntimeError(stderr)
-
         stdout = self.process.stdout.read().decode(**self.encoding_options)
 
         if not stdout:
@@ -138,7 +132,7 @@ def fzf_prompt(
             shallow_copy = {}
 
             def raw_process_save(value, processed_value):
-                
+
                 if processed_value in shallow_copy:
                     return raw_process_save(value, processed_value + "*")
 
