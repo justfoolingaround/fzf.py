@@ -2,7 +2,7 @@ import shutil
 import subprocess
 import typing
 
-from .options import get_opts
+get_opts = __import__('.options').get_opts
 
 EXECUTABLE = "fzf"
 
