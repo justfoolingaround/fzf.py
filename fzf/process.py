@@ -1,8 +1,9 @@
+import importlib
 import shutil
 import subprocess
 import typing
 
-get_opts = __import__('.options').get_opts
+get_opts = importlib.import_module(".options", __package__).get_opts
 
 EXECUTABLE = "fzf"
 
