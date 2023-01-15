@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "fzf.py"
-version = "0.1.0"
+version = "0.0.4"
 description = "Fzf.py - A Pythonic Fzf Wrapper"
 authors = ["justfoolingaround <kr.justfoolingaround@gmail.com>"]
 license = "GPTv3"
+packages = [{ include = "fzf" }, { include = "fzf/**/*.py" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
