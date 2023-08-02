@@ -10,8 +10,6 @@ get_opts = importlib.import_module(".options", __package__).get_opts
 
 EXECUTABLE = "fzf"
 
-has_fzf = lambda: shutil.which(EXECUTABLE) is not None
-
 
 def ensure_stdin_available(f):
     def __inner__(self, *args, **kwargs):
@@ -26,10 +24,18 @@ def ensure_stdin_available(f):
 class Fzf:
     fetch_options = staticmethod(get_opts)
 
-    def __init__(self, opts=None, *, encoding="utf-8", encoding_errors="strict"):
+    def __init__(
+        self,
+        executable=EXECUTABLE,
+        opts=None,
+        disable_env: bool = False,
+        *,
+        encoding="utf-8",
+        encoding_errors="strict"
+    ):
         opts = opts or []
 
-        if not has_fzf():
+        if shutil.which(executable) is None:
             raise RuntimeError(
                 "fzf was not found in PATH. Please ensure that the process can access fzf."
             )
@@ -38,6 +44,7 @@ class Fzf:
             [EXECUTABLE, *opts],
             stdout=subprocess.PIPE,
             stdin=subprocess.PIPE,
+            env={} if disable_env else None,
         )
         self.encoding_options = {
             "encoding": encoding,
@@ -45,9 +52,17 @@ class Fzf:
         }
 
     @classmethod
-    def load_with_options(cls, *, encoding="utf-8", encoding_errors="strict", **opts):
+    def load_with_options(
+        cls,
+        *,
+        executable=EXECUTABLE,
+        encoding="utf-8",
+        encoding_errors="strict",
+        **opts
+    ):
         return cls(
-            Fzf.fetch_options(**opts),
+            executable=executable,
+            opts=Fzf.fetch_options(**opts),
             encoding=encoding,
             encoding_errors=encoding_errors,
         )
@@ -63,6 +78,10 @@ class Fzf:
         if flush_last:
             self.to_stdin(flush=True)
 
+    @property
+    def is_alive(self):
+        return self.process.poll() is None
+
     def close(self):
         try:
             if not self.process.stdin.closed:
@@ -76,7 +95,8 @@ class Fzf:
                 self.process.stdin.write(data)
             if flush:
                 self.process.stdin.flush()
-        except BrokenPipeError:
+
+        except (BrokenPipeError, OSError):
             return False
 
         return True
@@ -120,10 +140,15 @@ def fzf_prompt(
     encoding_errors: str = "strict",
     duplication_treatment: typing.Callable[[str], str] = lambda value: value + "*",
     flush_last: bool = False,
+    *,
+    executable=EXECUTABLE,
     **opts
 ) -> typing.Union[T, typing.List[T]]:
     with Fzf.load_with_options(
-        encoding=encoding, encoding_errors=encoding_errors, **opts
+        executable=executable,
+        encoding=encoding,
+        encoding_errors=encoding_errors,
+        **opts
     ) as fzf:
         if escape_output:
             output_escape = lambda value: repr(value)[
@@ -168,6 +193,6 @@ def fzf_prompt(
     return output
 
 
-def get_fzf_version():
-    with Fzf(["--version"]) as fzf:
+def get_fzf_version(executable=EXECUTABLE):
+    with Fzf(executable, ["--version"]) as fzf:
         return fzf.get_output()
