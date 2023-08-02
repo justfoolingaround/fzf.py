@@ -3,6 +3,9 @@ import shutil
 import subprocess
 import typing
 
+T = typing.TypeVar("T")
+
+
 get_opts = importlib.import_module(".options", __package__).get_opts
 
 EXECUTABLE = "fzf"
@@ -23,7 +26,9 @@ def ensure_stdin_available(f):
 class Fzf:
     fetch_options = staticmethod(get_opts)
 
-    def __init__(self, opts=[], *, encoding="utf-8", encoding_errors="strict"):
+    def __init__(self, opts=None, *, encoding="utf-8", encoding_errors="strict"):
+        opts = opts or []
+
         if not has_fzf():
             raise RuntimeError(
                 "fzf was not found in PATH. Please ensure that the process can access fzf."
@@ -48,7 +53,7 @@ class Fzf:
         )
 
     @ensure_stdin_available
-    def add_lines(self, lines: typing.Iterable, flush_last: bool = True):
+    def add_lines(self, lines: typing.Iterable[str], flush_last: bool = True):
         for line in lines:
             if not self.to_stdin(
                 data=line.encode(**self.encoding_options) + b"\n", flush=not flush_last
@@ -65,7 +70,7 @@ class Fzf:
         except OSError:
             pass
 
-    def to_stdin(self, data=None, flush=True):
+    def to_stdin(self, data: typing.Optional[typing.AnyStr] = None, flush: bool = True):
         try:
             if data is not None:
                 self.process.stdin.write(data)
@@ -77,7 +82,9 @@ class Fzf:
         return True
 
     @ensure_stdin_available
-    def pipe_from_stream(self, stream, flush_last: bool = True):
+    def pipe_from_stream(
+        self, stream: typing.IO[typing.AnyStr], flush_last: bool = True
+    ):
         for line in stream:
             if not self.to_stdin(line, flush=not flush_last):
                 return
@@ -106,28 +113,33 @@ class Fzf:
 
 
 def fzf_prompt(
-    components,
-    processor=None,
-    escape_output=True,
-    encoding="utf-8",
-    encoding_errors="strict",
-    flush_last=False,
+    components: typing.Iterable[T],
+    processor: typing.Optional[typing.Callable[[T], str]] = None,
+    escape_output: bool = True,
+    encoding: str = "utf-8",
+    encoding_errors: str = "strict",
+    duplication_treatment: typing.Callable[[str], str] = lambda value: value + "*",
+    flush_last: bool = False,
     **opts
-):
+) -> typing.Union[T, typing.List[T]]:
     with Fzf.load_with_options(
         encoding=encoding, encoding_errors=encoding_errors, **opts
     ) as fzf:
         if escape_output:
-            output_escape = lambda value: repr(value)[1:-1]
+            output_escape = lambda value: repr(value)[
+                1:-1
+            ]  # type: typing.Callable[[str], str]
         else:
-            output_escape = lambda value: value
+            output_escape = lambda value: value  # type: typing.Callable[[str], str]
 
         if processor:
             shallow_copy = {}
 
-            def raw_process_save(value, processed_value):
+            def raw_process_save(value: str, processed_value: str):
                 if processed_value in shallow_copy:
-                    return raw_process_save(value, processed_value + "*")
+                    return raw_process_save(
+                        value, duplication_treatment(processed_value)
+                    )
 
                 shallow_copy.update(
                     {
