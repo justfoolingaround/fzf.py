@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "krfzf.py"
-version = "0.0.4"
+version = "0.0.5"
 description = "Fzf.py - A Pythonic Fzf Wrapper"
 authors = ["justfoolingaround <kr.justfoolingaround@gmail.com>"]
 license = "GPTv3"
