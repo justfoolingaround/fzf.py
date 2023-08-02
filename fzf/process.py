@@ -21,11 +21,9 @@ def ensure_stdin_available(f):
 
 
 class Fzf:
-
     fetch_options = staticmethod(get_opts)
 
     def __init__(self, opts=[], *, encoding="utf-8", encoding_errors="strict"):
-
         if not has_fzf():
             raise RuntimeError(
                 "fzf was not found in PATH. Please ensure that the process can access fzf."
@@ -51,9 +49,7 @@ class Fzf:
 
     @ensure_stdin_available
     def add_lines(self, lines: typing.Iterable, flush_last: bool = True):
-
         for line in lines:
-
             if not self.to_stdin(
                 data=line.encode(**self.encoding_options) + b"\n", flush=not flush_last
             ):
@@ -63,7 +59,6 @@ class Fzf:
             self.to_stdin(flush=True)
 
     def close(self):
-
         try:
             if not self.process.stdin.closed:
                 self.process.stdin.close()
@@ -91,7 +86,6 @@ class Fzf:
             self.to_stdin(flush=True)
 
     def get_output(self):
-
         self.process.wait()
 
         stdout = self.process.stdout.read().decode(**self.encoding_options)
@@ -123,7 +117,6 @@ def fzf_prompt(
     with Fzf.load_with_options(
         encoding=encoding, encoding_errors=encoding_errors, **opts
     ) as fzf:
-
         if escape_output:
             output_escape = lambda value: repr(value)[1:-1]
         else:
@@ -133,7 +126,6 @@ def fzf_prompt(
             shallow_copy = {}
 
             def raw_process_save(value, processed_value):
-
                 if processed_value in shallow_copy:
                     return raw_process_save(value, processed_value + "*")
 
@@ -156,6 +148,9 @@ def fzf_prompt(
     output = fzf.get_output()
 
     if processor and output is not None:
+        if isinstance(output, list):
+            return [shallow_copy[value] for value in output]
+
         return shallow_copy[output]
 
     return output
