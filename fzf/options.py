@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 
 
 class Algorithm(enum.Enum):
@@ -7,7 +8,6 @@ class Algorithm(enum.Enum):
 
 
 class TiebreakSetting(enum.Enum):
-
     LENGTH = "length"
     BEGIN = "begin"
     END = "end"
@@ -15,14 +15,12 @@ class TiebreakSetting(enum.Enum):
 
 
 class Layout(enum.Enum):
-
     DEFAULT = "default"
     REVERSE = "reverse"
     REVERSE_LIST = "reverse-list"
 
 
 class BorderStyle(enum.Enum):
-
     ROUNDED = "rounded"
     SHARP = "sharp"
     HORIZONTAL = "horizontal"
@@ -35,7 +33,6 @@ class BorderStyle(enum.Enum):
 
 
 class InfoStyle(enum.Enum):
-
     DEFAULT = "default"
     INLINE = "inline"
     HIDDEN = "hidden"
@@ -47,53 +44,53 @@ def get_opts(
     case_insensitive: bool = True,
     normalise_literals: bool = True,
     algo_type: Algorithm = Algorithm.V2,
-    field_index_expressions: str = None,
-    with_field_index_expressions: str = None,
-    delimiter: str = None,
+    field_index_expressions: Optional[str] = None,
+    with_field_index_expressions: Optional[str] = None,
+    delimiter: Optional[str] = None,
     disable_search: bool = False,
     sort_results: bool = True,
     reverse_results: bool = False,
-    tiebreak_settings: TiebreakSetting = None,
+    tiebreak_settings: Optional[TiebreakSetting] = None,
     multi=False,
     mouse=True,
-    keybinds: str = None,
+    keybinds: Optional[str] = None,
     cycle=False,
     keep_right=False,
-    scroll_off_lines: int = None,
+    scroll_off_lines: Optional[int] = None,
     disable_horizontal_scroll=False,
     filepath_word=False,
-    jump_labels: str = None,
-    height: str = None,
-    minimum_height: str = None,
-    layout: Layout = None,
+    jump_labels: Optional[str] = None,
+    height: Optional[str] = None,
+    minimum_height: Optional[str] = None,
+    layout: Optional[Layout] = None,
     reversed_layout: bool = False,
-    border_style: BorderStyle = None,
+    border_style: Optional[BorderStyle] = None,
     only_ascii_borders: bool = False,
-    margin: str = None,
-    padding: str = None,
-    info_style: InfoStyle = None,
+    margin: Optional[str] = None,
+    padding: Optional[str] = None,
+    info_style: Optional[InfoStyle] = None,
     hide_info: bool = False,
-    prompt_string: str = None,
-    pointer_string: str = None,
-    selected_string: str = None,
-    header: str = None,
-    header_lines: int = None,
+    prompt_string: Optional[str] = None,
+    pointer_string: Optional[str] = None,
+    selected_string: Optional[str] = None,
+    header: Optional[str] = None,
+    header_lines: Optional[int] = None,
     header_first: bool = False,
     ansi: bool = False,
-    tab_character_number: int = None,
-    color: str = None,
+    tab_character_number: Optional[int] = None,
+    color: Optional[str] = None,
     bold_off: bool = False,
     use_black_background: bool = False,
-    history_file: str = None,
-    history_size: int = None,
-    preview: str = None,
-    preview_window_settings: str = None,
-    query: str = None,
+    history_file: Optional[str] = None,
+    history_size: Optional[int] = None,
+    preview: Optional[str] = None,
+    preview_window_settings: Optional[str] = None,
+    query: Optional[str] = None,
     select_first: bool = False,
     exit_when_empty: bool = False,
-    filter_mode: str = None,
+    filter_mode: Optional[str] = None,
     print_query: bool = False,
-    expect_keys: str = None,
+    expect_keys: Optional[str] = None,
     read0: bool = False,
     print0: bool = False,
     clear_screen: bool = True,
